@@ -2,12 +2,14 @@ import { useState } from "react";
 import { loginUser } from "../../API/endpoints";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useCart } from "../../context/CartContext";
+import { useDispatch } from "react-redux";
+import { fetchCart } from "../../store/cartSlice";
+import { fetchWishlist } from "../../store/wishlistSlice";
 import "./Auth.css";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { refreshCart } = useCart();
+  const dispatch = useDispatch();
 
   const [form, setForm] = useState({
     email: "",
@@ -22,10 +24,11 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await loginUser(form);
-      console.log(res.data.token, "this is res");
+
       sessionStorage.setItem("token", res.data.token);
       localStorage.setItem("token", res.data.token);
-      refreshCart();
+      dispatch(fetchCart());
+      dispatch(fetchWishlist());
       toast.success("Login Successful!");
       navigate("/");
     } catch (error) {

@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Navbar from '../../components/Home/Navbar';
 import ProfileSidebar from '../../components/Profile/ProfileSidebar';
-import { useWishlist } from '../../context/WishlistContext';
-import { useCart } from '../../context/CartContext';
+import { fetchWishlist, toggleWishlist as toggleWishlistThunk } from '../../store/wishlistSlice';
+import { fetchCart } from '../../store/cartSlice';
 import { addToCart as addToCartAPI, getUserProfile } from '../../API/endpoints';
 import { toast } from 'react-toastify';
 import './Wishlist.css';
 
 const Wishlist = () => {
     const navigate = useNavigate();
-    const { wishlistItems, toggleWishlist, loading: wishlistLoading } = useWishlist();
-    const { refreshCart } = useCart();
+    const dispatch = useDispatch();
+    const { wishlistItems, loading: wishlistLoading } = useSelector((state) => state.wishlist);
     const [userData, setUserData] = useState(null);
     const [profileLoading, setProfileLoading] = useState(true);
 
@@ -40,7 +41,7 @@ const Wishlist = () => {
         try {
             const response = await addToCartAPI({ productId: product._id, quantity: 1 });
             if (response.status === 200) {
-                refreshCart();
+                dispatch(fetchCart());
                 toast.success(`${product.name} added to cart!`);
             }
         } catch (err) {
@@ -50,7 +51,7 @@ const Wishlist = () => {
     };
 
     const handleRemove = async (productId) => {
-        await toggleWishlist(productId);
+        await dispatch(toggleWishlistThunk(productId));
         toast.info("Removed from wishlist");
     };
 

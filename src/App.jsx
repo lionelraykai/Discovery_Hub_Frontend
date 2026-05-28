@@ -1,115 +1,79 @@
-import { BrowserRouter as Router, Routes, Route, Outlet, Navigate, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
-import Navigation from './components/Navigation';
-import LoginRequiredModal from './components/LoginRequiredModal';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import Home from "./screens/Home/Home";
+import Login from "./screens/Auth/Login";
+import Signup from "./screens/Auth/SignUp";
+import ProductDetails from "./screens/ProductDetails/ProductDetails";
+import Profile from "./screens/Profile/Profile";
+import Cart from "./screens/Cart/Cart";
+import PaymentScreen from "./screens/Payment/PaymentScreen";
+import Address from "./screens/Address/Address";
+import Orders from "./screens/Orders/Orders";
+import OrderDetails from "./screens/Orders/OrderDetails";
+import Wishlist from "./screens/Wishlist/Wishlist";
+import Security from "./screens/Security/Security";
+import ScrollToTop from "./components/ScrollToTop";
 
-import Home from './pages/Home';
-import KnotDetail from './pages/KnotDetail';
-import PostKnot from './pages/PostKnot';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
-import Profile from './pages/Profile';
-import EditProfile from './pages/EditProfile';
-import BlogsFeed from './pages/BlogsFeed';
-import BlogDetail from './pages/BlogDetail';
-import CreateBlog from './pages/CreateBlog';
-import DraftsFeed from './pages/DraftsFeed';
-import ScrollToTop from './components/ScrollToTop';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import CartBanner from "./components/Cart/CartBanner";
 
-import './App.css';
-
-function ProtectedRoute({ children }) {
-  const { user } = useAuth();
-  const location = useLocation();
-
-  if (!user) {
-    // Redirect to home and pass state to open the modal
-    return <Navigate to="/" state={{ triggerModal: true, from: location }} replace />;
-  }
-
-  return children;
-}
-
-function MainLayout() {
-  const { isLoginModalOpen, closeLoginModal, openLoginModal } = useAuth();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.state?.triggerModal) {
-      openLoginModal();
-      // Clear the state so it doesn't reopen on every navigation
-      window.history.replaceState({}, document.title);
-    }
-  }, [location, openLoginModal]);
-
+const PageWrapper = ({ children }) => {
   return (
-    <>
-      <Navigation />
-      <main>
-        <Outlet />
-      </main>
-      <LoginRequiredModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
-    </>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="w-full flex-grow flex flex-col"
+    >
+      {children}
+    </motion.div>
   );
-}
+};
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route path="/signup" element={<PageWrapper><Signup /></PageWrapper>} />
+        <Route path="/product/:id" element={<PageWrapper><ProductDetails/></PageWrapper>}/>
+        <Route path="/cart" element={<PageWrapper><Cart /></PageWrapper>} />
+        <Route path="/payment" element={<PageWrapper><PaymentScreen /></PageWrapper>} />
+        <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+        <Route path="/wishlist" element={<PageWrapper><Wishlist /></PageWrapper>} />
+        <Route path="/security" element={<PageWrapper><Security /></PageWrapper>} />
+        <Route path="/orders" element={<PageWrapper><Orders /></PageWrapper>} />
+        <Route path="/order/:id" element={<PageWrapper><OrderDetails /></PageWrapper>} />
+        <Route path="/address" element={<PageWrapper><Address /></PageWrapper>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          {/* Dashboard Layout (with Nav) */}
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/knot/:id" element={<KnotDetail />} />
-            
-            <Route path="/blogs" element={<BlogsFeed />} />
-            <Route path="/blogs/:id" element={<BlogDetail />} />
-            <Route path="/drafts" element={<DraftsFeed />} />
-
-            {/* Protected Route */}
-            <Route 
-              path="/post-blog" 
-              element={
-                <ProtectedRoute>
-                  <CreateBlog />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/post" 
-              element={
-                <ProtectedRoute>
-                  <PostKnot />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/profile" 
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/profile/edit" 
-              element={
-                <ProtectedRoute>
-                  <EditProfile />
-                </ProtectedRoute>
-              } 
-            />
-          </Route>
-
-          {/* Auth Layout (No Nav) */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <BrowserRouter>
+      <ScrollToTop />
+      <AnimatedRoutes />
+      <CartBanner />
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+    </BrowserRouter>
   );
 }
 

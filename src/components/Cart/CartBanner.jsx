@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
+import { useSelector } from "react-redux";
 import "./CartBanner.css";
 
 const CartBanner = () => {
-  const { cartCount, cartItems } = useCart();
+  const { cartCount, cartItems } = useSelector((state) => state.cart);
   const navigate = useNavigate();
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(false);

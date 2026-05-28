@@ -8,7 +8,6 @@ import { toast } from 'react-toastify';
 
 import Navbar from '../../components/Home/Navbar';
 import ProfileSidebar from '../../components/Profile/ProfileSidebar';
-import { useCart } from '../../context/CartContext';
 import { getUserProfile } from '../../API/endpoints';
 import 'leaflet/dist/leaflet.css';
 
@@ -27,7 +26,6 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const Address = () => {
     const navigate = useNavigate();
-    const { refreshCart } = useCart();
     const [addresses, setAddresses] = useState([]);
     const [userData, setUserData] = useState(null);
     const [profileLoading, setProfileLoading] = useState(true);

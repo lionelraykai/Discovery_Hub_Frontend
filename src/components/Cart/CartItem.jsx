@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import { useDispatch } from 'react-redux';
+import { removeItem } from '../../store/cartSlice';
 import ConfirmModal from '../ConfirmModal';
 
 const CartItem = ({ item, updating, onUpdateQty }) => {
-  const { removeItem } = useCart();
+  const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleRemove = async () => {
     setIsModalOpen(false);
-    await removeItem(item.product._id);
+    await dispatch(removeItem(item.product._id));
     if (onUpdateQty) {
       onUpdateQty(); 
     }

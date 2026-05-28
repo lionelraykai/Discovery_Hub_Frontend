@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Home/Navbar';
 import ProfileSidebar from '../../components/Profile/ProfileSidebar';
-import { useCart } from '../../context/CartContext';
 import { getMyOrders, getUserProfile } from '../../API/endpoints';
 import LoadingOverlay from '../../components/Loading/LoadingOverlay';
 
 const Orders = () => {
     const navigate = useNavigate();
-    const { refreshCart } = useCart();
     const [orders, setOrders] = useState([]);
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);

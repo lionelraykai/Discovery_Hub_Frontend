@@ -1,18 +1,21 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import { useDispatch } from 'react-redux';
+import { resetCart } from '../../store/cartSlice';
+import { resetWishlist } from '../../store/wishlistSlice';
 
 const BASE_URL = 'http://localhost:5001';
 
 const ProfileSidebar = ({ userData, loading }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { refreshCart } = useCart();
+    const dispatch = useDispatch();
 
     const handleLogout = () => {
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");
-        refreshCart();
+        dispatch(resetCart());
+        dispatch(resetWishlist());
         navigate("/login");
     };
 

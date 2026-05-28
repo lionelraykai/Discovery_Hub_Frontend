@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getCart, getPaymentMethods, createOrder, processPayment } from '../../API/endpoints';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearCartAfterOrder } from '../../store/cartSlice';
+import { getPaymentMethods, createOrder, processPayment } from '../../API/endpoints';
 import Navbar from '../../components/Home/Navbar';
 import Footer from '../../components/Home/Footer';
 import PaymentSection from '../../components/Cart/PaymentSection';
 import OrderSummary from '../../components/Cart/OrderSummary';
-import { useCart } from '../../context/CartContext';
 import { toast } from 'react-toastify';
 import LoadingOverlay from '../../components/Loading/LoadingOverlay';
 import './PaymentScreen.css';
@@ -13,24 +14,12 @@ import './PaymentScreen.css';
 const PaymentScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { clearCartAfterOrder } = useCart();
+  const dispatch = useDispatch();
+  const { cartItems } = useSelector((state) => state.cart);
   const addressId = location.state?.addressId;
-  const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [activePaymentMethod, setActivePaymentMethod] = useState(null);
-
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
-      const response = await getCart();
-      setCart(response.data);
-    } catch (err) {
-      console.error("Error fetching cart:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchPaymentMethods = async () => {
     try {
@@ -47,8 +36,12 @@ const PaymentScreen = () => {
   };
 
   useEffect(() => {
-    fetchCart();
-    fetchPaymentMethods();
+    const initPayment = async () => {
+      setLoading(true);
+      await fetchPaymentMethods();
+      setLoading(false);
+    };
+    initPayment();
   }, []);
 
   const handlePayment = () => {
@@ -73,7 +66,7 @@ const PaymentScreen = () => {
       const orderId = orderResponse.data._id;
       
       // Clear cart instantly since backend order creation clears it
-      clearCartAfterOrder();
+      dispatch(clearCartAfterOrder());
 
       // 2. Process the payment
       return processPayment({
@@ -100,7 +93,7 @@ const PaymentScreen = () => {
     });
   };
 
-  const subtotal = cart?.items?.reduce((acc, item) => acc + (item.product.price * item.quantity), 0) || 0;
+  const subtotal = cartItems?.reduce((acc, item) => acc + (item.product.price * item.quantity), 0) || 0;
   const shipping = subtotal > 0 ? (subtotal > 500 ? 0 : 50) : 0;
   const estimatedTax = subtotal * 0.08;
   const total = subtotal + shipping + estimatedTax;

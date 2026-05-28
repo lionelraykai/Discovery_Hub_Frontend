@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Home/Navbar';
 import ProfileSidebar from '../../components/Profile/ProfileSidebar';
-import { useCart } from '../../context/CartContext';
 import { getUserProfile, updateUserProfile, updateProfileImage } from '../../API/endpoints';
 import { toast } from 'react-toastify';
 
@@ -10,7 +9,6 @@ const BASE_URL = 'http://localhost:5001';
 
 const Profile = () => {
     const navigate = useNavigate();
-    const { refreshCart } = useCart();
     const [preferences, setPreferences] = useState({
         promotions: true,
         updates: true,
@@ -95,7 +93,7 @@ const Profile = () => {
     const togglePreference = (key) => {
         setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
     };
-console.log(`${BASE_URL}${userData.profileImage}`,'fdasjdhdf')
+
 
     return (
         <div className="min-h-screen bg-[#f3f6ff] font-['Inter']">
